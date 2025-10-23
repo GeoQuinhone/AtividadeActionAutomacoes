@@ -1,0 +1,30 @@
+name: Automations - Contagem e Checks
+
+on:
+  push:
+    paths:
+      - '**/*'
+  workflow_dispatch: {}
+  schedule:
+    - cron: '0 3 * * *'  # aqui para o horario do brasil (UTC-3)
+
+jobs:
+  scheduled-midnight-count:
+    name: Agendamento meia-noite (Brasil) — contar arquivos
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Contar arquivos HTML/CSS/JS
+        run: |
+          total_html=$(find . -type f -name '*.html' | wc -l)
+          total_css=$(find . -type f -name '*.css' | wc -l)
+          total_js=$(find . -type f -name '*.js' | wc -l)
+          echo "Arquivos HTML: $total_html"
+          echo "Arquivos CSS: $total_css"
+          echo "Arquivos JS: $total_js"
+
+      - name: Mostrar data e hora no Brasil
+        run: |
+          TZ='America/Sao_Paulo' date
