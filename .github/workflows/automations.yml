@@ -28,7 +28,7 @@ jobs:
           TZ='America/Sao_Paulo' date
 
       - name: Usuário que fez o push
-        run: echo "Usuário: ${{ github.actor }}"
+        run: 'echo "Usuário: ${{ github.actor }}"'
 
       - name: Calcular 2 + 2 no terminal
         run: |
