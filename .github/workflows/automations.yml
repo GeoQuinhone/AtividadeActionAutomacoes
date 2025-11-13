@@ -2,12 +2,9 @@ name: Automations - Contagem e Checks
 
 on:
   push:
-    paths:
-      - '**/*'
-  workflow_dispatch: {}
-  schedule:
-    # Executa todos os dias à meia-noite no horário de Brasília (UTC-3)
-    - cron: '0 3 * * *'
+    branches:
+      - main
+   
 
 jobs:
   run-on-push:
@@ -19,134 +16,5 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Hello World
-        run: echo "Hello World"
-
-      - name: Mostrar data e hora do push (horário do Brasil)
-        run: |
-          echo "Data e hora (Brasil):"
-          TZ='America/Sao_Paulo' date
-
-      - name: Usuário que fez o push
-        run: 'echo "Usuário: ${{ github.actor }}"'
-
-      - name: Calcular 2 + 2 no terminal
-        run: |
-          soma=$((2+2))
-          echo "2 + 2 = $soma"
-
-      - name: Listar arquivos no repositório
-        run: |
-          echo "Arquivos encontrados:"
-          find . -maxdepth 3 -type f -print
-
-      - name: Contar arquivos HTML
-        id: count_html
-        run: |
-          count_html=$(find . -type f -name '*.html' | wc -l)
-          echo "count_html=$count_html" >> $GITHUB_OUTPUT
-          echo "Total de arquivos HTML: $count_html"
-
-      - name: Criar README caso não exista e preencher
-        run: |
-          if [ ! -f README.md ]; then
-            echo "Criando README.md"
-            echo "Este README foi criado automaticamente em $(TZ='America/Sao_Paulo' date)" > README.md
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add README.md && git commit -m "chore: add README by workflow" || echo "Nada a commitar"
-          else
-            echo "README.md já existe"
-          fi
-
-      - name: Alertar se arquivos maiores que 100KB existirem
-        run: |
-          echo "Procurando arquivos maiores que 100KB..."
-          bigs=$(find . -type f -size +100k -print)
-          if [ -n "$bigs" ]; then
-            echo "⚠️ ALERTA: arquivos grandes encontrados:"
-            echo "$bigs"
-            exit 1
-          else
-            echo "Nenhum arquivo maior que 100KB encontrado."
-          fi
-
-      - name: Contar html/css/js enviados no commit (sem sequência)
-        id: changed_counts
-        run: |
-          echo "Contando arquivos alterados..."
-          git fetch --no-tags --prune --unshallow || true
-          changed=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} || true)
-
-          html_count=$(echo "$changed" | grep -E '\.html$' | wc -l)
-          css_count=$(echo "$changed" | grep -E '\.css$' | wc -l)
-          js_count=$(echo "$changed" | grep -E '\.js$' | wc -l)
-
-          echo "HTML alterados: $html_count"
-          echo "CSS alterados: $css_count"
-          echo "JS alterados: $js_count"
-          echo "html_total=$html_count" >> $GITHUB_OUTPUT
-          echo "css_total=$css_count" >> $GITHUB_OUTPUT
-          echo "js_total=$js_count" >> $GITHUB_OUTPUT
-
-      - name: Contagem em sequência (ordem de aparecimento)
-        run: |
-          echo "Verificando sequência de arquivos modificados..."
-          git fetch --no-tags --prune --unshallow || true
-          changed_lines=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} || true)
-          seq=""
-          while read -r f; do
-            case "$f" in
-              *.html) seq+="html,";;
-              *.css) seq+="css,";;
-              *.js) seq+="js,";;
-            esac
-          done <<< "$changed_lines"
-          echo "Sequência detectada: $seq"
-
-  scheduled-midnight-count:
-    name: Agendamento meia-noite (Brasil) — contar arquivos
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Contar arquivos HTML/CSS/JS
-        run: |
-          total_html=$(find . -type f -name '*.html' | wc -l)
-          total_css=$(find . -type f -name '*.css' | wc -l)
-          total_js=$(find . -type f -name '*.js' | wc -l)
-          echo "Arquivos HTML: $total_html"
-          echo "Arquivos CSS: $total_css"
-          echo "Arquivos JS: $total_js"
-
-      - name: Mostrar data e hora no Brasil
-        run: |
-          TZ='America/Sao_Paulo' date
-
-  conditional-night-or-saturday:
-    name: Condicionais — rodar à noite ou aos sábados
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Rodar somente à noite (20h–05h Brasil)
-        run: |
-          hora=$(TZ='America/Sao_Paulo' date +%H)
-          echo "Hora (Brasil): $hora"
-          if [ $hora -ge 20 ] || [ $hora -le 5 ]; then
-            echo "🌙 É noite — executando ações noturnas."
-          else
-            echo "☀️ Não é noite — pulando execução."
-          fi
-
-      - name: Rodar somente aos sábados
-        run: |
-          dia=$(TZ='America/Sao_Paulo' date +%u)
-          echo "Dia da semana (1=Seg ... 7=Dom): $dia"
-          if [ "$dia" -eq 6 ]; then
-            echo "✅ Hoje é sábado — executando tarefas do sábado."
-          else
-            echo "❌ Não é sábado — pulando."
-          fi
+      - name: Git Action
+        run: echo "Prova Git action"
